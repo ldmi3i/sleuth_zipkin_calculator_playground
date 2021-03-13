@@ -22,6 +22,10 @@ allprojects {
 
     apply plugin: 'io.spring.dependency-management'
 
+    dependencies {
+
+    }
+
     dependencyManagement {
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
