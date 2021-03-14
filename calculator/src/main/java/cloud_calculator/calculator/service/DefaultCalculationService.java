@@ -96,8 +96,13 @@ public class DefaultCalculationService implements CalculationService {
         for (char c : expression.toCharArray()) {
             if (operationSet.contains(c)) {
                 resultElements.add(sb.toString());
-                resultElements.add(Character.toString(c));
                 sb = new StringBuilder();
+                if (c == '-') {
+                    resultElements.add("+");
+                    sb.append(c);
+                } else {
+                    resultElements.add(Character.toString(c));
+                }
             } else {
                 sb.append(c);
             }

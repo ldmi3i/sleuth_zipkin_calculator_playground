@@ -1,5 +1,5 @@
 server:
-  port: 8019
+  port: 8023
 spring:
   application:
     name: division-service

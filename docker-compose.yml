@@ -31,7 +31,7 @@ services:
       context: ./subtraction
       dockerfile: Dockerfile
     ports:
-    - 8021:8019
+    - 8021:8021
     depends_on:
       - calculator_service
       - zipkin
@@ -42,7 +42,7 @@ services:
       context: ./multiplication
       dockerfile: Dockerfile
     ports:
-    - 8022:8019
+    - 8022:8022
     depends_on:
       - calculator_service
       - zipkin
@@ -53,7 +53,7 @@ services:
       context: ./division
       dockerfile: Dockerfile
     ports:
-    - 8023:8019
+    - 8023:8023
     depends_on:
       - calculator_service
       - zipkin
