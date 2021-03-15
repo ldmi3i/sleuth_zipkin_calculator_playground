@@ -1,8 +1,8 @@
 package cloud_calculator.calculator.controller;
 
 import brave.Tracer;
-import cloud_calculator.calculator.model.CalculationRequest;
-import cloud_calculator.calculator.model.CalculationResponse;
+import cloud_calculator.common.model.CalculationRequest;
+import cloud_calculator.common.model.CalculationResponse;
 import cloud_calculator.calculator.service.CalculationService;
 import cloud_calculator.common.model.TagTypes;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
 package cloud_calculator.calculator.service;
 
-import cloud_calculator.calculator.model.CalculationRequest;
-import cloud_calculator.calculator.model.CalculationResponse;
+import cloud_calculator.common.model.CalculationRequest;
+import cloud_calculator.common.model.CalculationResponse;
 import cloud_calculator.calculator.model.ExpressionType;
 import cloud_calculator.calculator.model.TypedExpressionRequest;
 import cloud_calculator.calculator.utils.IdProvider;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,6 +24,8 @@ public class DefaultCalculationService implements CalculationService {
     private final String firstPriority = "*/";
     private final String secondPriority = "+-";
     private final String idPattern = "^\\{\\d+}$";
+    private final List<String> operationPriorities = new ArrayList<>();
+    private final Set<Character> allAvailableOperations = new HashSet<>();
 
     private final IdProvider idProvider;
     private final RemoteCalcService remoteCalcService;
@@ -31,6 +34,19 @@ public class DefaultCalculationService implements CalculationService {
                                      RemoteCalcService remoteCalcService) {
         this.idProvider = idProvider;
         this.remoteCalcService = remoteCalcService;
+    }
+
+    @PostConstruct
+    public void init() {
+        operationPriorities.add("^");
+        operationPriorities.add("*/");
+        operationPriorities.add("+-");
+
+        operationPriorities.forEach(operations -> {
+            for (char c : operations.toCharArray()) {
+                allAvailableOperations.add(c);
+            }
+        });
     }
 
     @Override
@@ -45,9 +61,17 @@ public class DefaultCalculationService implements CalculationService {
                         log.debug("expand finishing with splitted {}", splitted);
                         return Mono.empty();
                     }
-                    log.debug("Expand continuous to {}", splitted);
-                    return getWithOperations(splitted, firstPriority)
-                            .switchIfEmpty(getWithOperations(splitted, secondPriority))
+
+                    return Mono.fromCallable(() -> {
+                                int i = 0;
+                                List<TypedExpressionRequest> resultList = new ArrayList<>();
+                                while (i < operationPriorities.size() && resultList.isEmpty()) {
+                                    resultList.addAll(getWithOperations(splitted, operationPriorities.get(i++)));
+                                }
+                                return resultList;
+                            })
+                            .flatMapMany(Flux::fromIterable)
+                            .doOnNext(typedExpressionRequest -> log.trace("capture request {}", typedExpressionRequest))
                             .transform(remoteCalcService::requestResponse)
                             .collectList()
                             .map(responses -> updateExpressions(responses, splitted));
@@ -83,18 +107,10 @@ public class DefaultCalculationService implements CalculationService {
         if (expression.isBlank())
             return new ArrayList<>();
 
-        Set<Character> operationSet = new HashSet<>();
-        for (char c : firstPriority.toCharArray()) {
-            operationSet.add(c);
-        }
-        for (char c : secondPriority.toCharArray()) {
-            operationSet.add(c);
-        }
-
         List<String> resultElements = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         for (char c : expression.toCharArray()) {
-            if (operationSet.contains(c)) {
+            if (allAvailableOperations.contains(c)) {
                 resultElements.add(sb.toString());
                 sb = new StringBuilder();
                 if (c == '-') {
@@ -111,34 +127,32 @@ public class DefaultCalculationService implements CalculationService {
         return resultElements;
     }
 
-    private Flux<TypedExpressionRequest> getWithOperations(List<String> expressions, String operations) {
-        return Mono.fromCallable(() -> {
-            String prev = null;
-            List<TypedExpressionRequest> resultExpressions = new ArrayList<>();
-            for (int i = 0; i < expressions.size(); i++) {
-                String left;
-                String right;
-                String currentExpression = expressions.get(i);
-                if (operations.contains(currentExpression) &&
-                        i > 0 && i < expressions.size() - 1 &&
-                        !(left = expressions.get(i - 1)).matches(idPattern)
-                        && !(right = expressions.get(i + 1)).matches(idPattern)) {
-                    TypedExpressionRequest typedExpression = new TypedExpressionRequest();
-                    ExpressionRequest expressionRequest = new ExpressionRequest();
-                    typedExpression.setExpressionRequest(expressionRequest);
-                    typedExpression.setExpressionType(ExpressionType.getByOperator(currentExpression));
-                    expressionRequest.setLeft(Double.parseDouble(left));
-                    expressionRequest.setRight(Double.parseDouble(right));
-                    expressions.remove(i);
-                    expressions.remove(i);
-                    Long id = idProvider.getNext();
-                    expressions.set(i - 1, "{" + id + "}");
-                    expressionRequest.setId(id);
-                    resultExpressions.add(typedExpression);
-                    i --;
-                }
+    private List<TypedExpressionRequest> getWithOperations(List<String> expressions, String operations) {
+        String prev = null;
+        List<TypedExpressionRequest> resultExpressions = new ArrayList<>();
+        for (int i = 0; i < expressions.size(); i++) {
+            String left;
+            String right;
+            String currentExpression = expressions.get(i);
+            if (operations.contains(currentExpression) &&
+                    i > 0 && i < expressions.size() - 1 &&
+                    !(left = expressions.get(i - 1)).matches(idPattern)
+                    && !(right = expressions.get(i + 1)).matches(idPattern)) {
+                TypedExpressionRequest typedExpression = new TypedExpressionRequest();
+                ExpressionRequest expressionRequest = new ExpressionRequest();
+                typedExpression.setExpressionRequest(expressionRequest);
+                typedExpression.setExpressionType(ExpressionType.getByOperator(currentExpression));
+                expressionRequest.setLeft(Double.parseDouble(left));
+                expressionRequest.setRight(Double.parseDouble(right));
+                expressions.remove(i);
+                expressions.remove(i);
+                Long id = idProvider.getNext();
+                expressions.set(i - 1, "{" + id + "}");
+                expressionRequest.setId(id);
+                resultExpressions.add(typedExpression);
+                i--;
             }
-            return resultExpressions;
-        }).flatMapMany(Flux::fromIterable);
+        }
+        return resultExpressions;
     }
 }

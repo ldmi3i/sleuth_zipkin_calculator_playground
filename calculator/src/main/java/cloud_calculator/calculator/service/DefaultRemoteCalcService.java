@@ -37,7 +37,7 @@ public class DefaultRemoteCalcService implements RemoteCalcService {
         String divisionHost = commonProperties.getDebug() ? "localhost:8023" : "division:8023";
 
         serviceUrlMapping.put(ExpressionType.ADDITION, "http://" + additionHost + "/addition");
-        serviceUrlMapping.put(ExpressionType.SUBTRACTION, "http://" + subtractionHost + "/subtraction");
+        serviceUrlMapping.put(ExpressionType.EXPONENTIATION, "http://" + subtractionHost + "/exponentiation");
         serviceUrlMapping.put(ExpressionType.DIVISION, "http://" + divisionHost + "/division");
         serviceUrlMapping.put(ExpressionType.MULTIPLICATION, "http://" + multiplicationHost + "/multiplication");
     }
