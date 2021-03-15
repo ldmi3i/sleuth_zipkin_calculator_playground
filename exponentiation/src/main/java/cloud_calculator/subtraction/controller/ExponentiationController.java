@@ -15,11 +15,11 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
-@RequestMapping("/subtraction")
-public class SubtractionController implements OperationController {
+@RequestMapping("/exponentiation")
+public class ExponentiationController implements OperationController {
     private final Tracer tracer;
 
-    public SubtractionController(Tracer tracer) {
+    public ExponentiationController(Tracer tracer) {
         this.tracer = tracer;
     }
 

@@ -32,7 +32,7 @@ public class DefaultRemoteCalcService implements RemoteCalcService {
     @PostConstruct
     public void init() {
         String additionHost = commonProperties.getDebug() ? "localhost:8020" : "addition:8020";
-        String subtractionHost = commonProperties.getDebug() ? "localhost:8021" : "subtraction:8021";
+        String subtractionHost = commonProperties.getDebug() ? "localhost:8021" : "exponentiation:8021";
         String multiplicationHost = commonProperties.getDebug() ? "localhost:8022" : "multiplication:8022";
         String divisionHost = commonProperties.getDebug() ? "localhost:8023" : "division:8023";
 
