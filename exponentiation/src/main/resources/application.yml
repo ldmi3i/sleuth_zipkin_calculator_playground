@@ -1,0 +1,10 @@
+server:
+  port: 8021
+spring:
+  application:
+    name: exponentiation-service
+  zipkin:
+    base-url: http://zipkin:9411/
+logging:
+  level:
+    root: trace

@@ -1,7 +1,0 @@
-server:
-  port: 8019
-spring:
-  application:
-    name: subtraction-service
-  zipkin:
-    base-url: http://zipkin:9411/

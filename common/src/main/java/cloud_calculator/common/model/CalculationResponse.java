@@ -1,4 +1,4 @@
-package cloud_calculator.calculator.model;
+package cloud_calculator.common.model;
 
 import lombok.Data;
 

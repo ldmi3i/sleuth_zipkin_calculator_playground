@@ -25,10 +25,10 @@ services:
       - calculator_service
       - zipkin
 
-  subtraction_service:
-    container_name: subtraction
+  exponentiation_service:
+    container_name: exponentiation
     build:
-      context: ./subtraction
+      context: ./exponentiation
       dockerfile: Dockerfile
     ports:
     - 8021:8021

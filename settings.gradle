@@ -8,5 +8,5 @@
  */
 
 rootProject.name = 'cloud_calculator'
-include('calculator', 'addition', 'subtraction', 'multiplication', 'division', 'common')
+include('calculator', 'addition', 'exponentiation', 'multiplication', 'division', 'common')
 
