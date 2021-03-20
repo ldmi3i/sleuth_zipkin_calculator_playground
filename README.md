@@ -1,8 +1,8 @@
-## Project main purpose is to tryout cloud sleuth and zipkin
+## Project main purpose is to tryout cloud sleuth and zipkin (Just for fun)
 ### Common description
 Project designed as distributed calculator - each service perform different arithmetic operation  
 After sending expression to main calculator service you can obtain traces using zipkin on http://localhost:9411/zipkin/  
-Traces depend on expression and there can be many variations  
+Traces depend on expression and there can have many variations  
 Also to all services added expression as tag and annotation of starting and ending events of "calculations"  
 they can be observed with zipkin
 
@@ -13,10 +13,10 @@ For example
 ```
 
 Supported operations: ```+ - * / ^```  
-Multiple consecutive signs currently not supported.
+Multiple consecutive signs currently not supported ( '5 * -6' ).
 
 ### Endpoints
-calculate endpoint: POST  
+'calculate' endpoint: POST  
 ```
  http://localhost:8019/calculate
 ```
@@ -27,5 +27,12 @@ body
 }
 ```
 
+### Build and start
+Required: docker, gradle and +- 3 gb of free memory.
+Build and start application with gradle and docker-compose:  
+```gradle clean build```  
+```docker-compose up -d --build```
+
 ### Notes
-Exponentiation operator can take only integer numbers because it converts it to expression and reuses base calculation endpoint
+Exponentiation operator can take only integer numbers because it converts it to expression and 
+reuses base calculation endpoint. (if number is double - it will be cast to int)

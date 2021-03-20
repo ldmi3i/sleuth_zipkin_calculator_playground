@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -52,6 +53,7 @@ public class DefaultCalculationService implements CalculationService {
     @Override
     public Mono<CalculationResponse> calculate(Mono<CalculationRequest> calculationRequestMono) {
         return calculationRequestMono
+                .publishOn(Schedulers.parallel())
                 .map(request -> {
                     String noSpacesExpr = request.getExpression().replaceAll("\\s+", "");
                     return splitExpression(noSpacesExpr);
