@@ -28,11 +28,17 @@ body
 ```
 
 ### Build and start
-Required: docker, gradle and +- 3 gb of free memory.
+Required: docker, gradle and 3+ gb of free memory.
 Build and start application with gradle and docker-compose:  
 ```gradle clean build```  
 ```docker-compose up -d --build```
 
+Stop and clean with:
+```docker-compose down --volumes --rmi local```
+
 ### Notes
+docker-compose file use the latest standard without version statement
+if you do not have the latest version of docker - add line to file like ```version '3.1'```
+
 Exponentiation operator can take only integer numbers because it converts it to expression and 
 reuses base calculation endpoint. (if number is double - it will be cast to int)

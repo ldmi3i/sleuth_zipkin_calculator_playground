@@ -38,6 +38,10 @@ public class MultiplicationController implements OperationController {
                         .result(expression.getLeft() * expression.getRight())
                         .id(expression.getId())
                         .build())
-                .doOnNext(expressionResponse -> log.info("Produce response {}", expressionResponse));
+                .doOnNext(expressionResponse -> {
+                    tracer.currentSpan().annotate("Return response " + expressionResponse);
+                    log.info("Return response {}", expressionResponse);
+                })
+                .doOnError(e -> tracer.currentSpan().annotate("Finished with error"));
     }
 }
