@@ -40,7 +40,8 @@ public class DefaultCalculationService implements CalculationService {
     @PostConstruct
     public void init() {
         operationPriorities.add("^");
-        operationPriorities.add("*/");
+        operationPriorities.add("/");
+        operationPriorities.add("*");
         operationPriorities.add("+-");
 
         operationPriorities.forEach(operations -> {
@@ -60,7 +61,7 @@ public class DefaultCalculationService implements CalculationService {
                 })
                 .expand(splitted -> {
                     if (splitted.size() == 1) {
-                        log.debug("expand finishing with splitted {}", splitted);
+                        log.debug("Expand finishing with splitted {}", splitted);
                         return Mono.empty();
                     }
 
@@ -73,7 +74,7 @@ public class DefaultCalculationService implements CalculationService {
                                 return resultList;
                             })
                             .flatMapMany(Flux::fromIterable)
-                            .doOnNext(typedExpressionRequest -> log.trace("capture request {}", typedExpressionRequest))
+                            .doOnNext(typedExpressionRequest -> log.trace("Capture request {}", typedExpressionRequest))
                             .transform(remoteCalcService::requestResponse)
                             .collectList()
                             .map(responses -> updateExpressions(responses, splitted));
@@ -111,14 +112,21 @@ public class DefaultCalculationService implements CalculationService {
 
         List<String> resultElements = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        for (char c : expression.toCharArray()) {
+        char[] expressionChars = expression.toCharArray();
+        int exprLength = expressionChars.length;
+        for (int i = 0; i < exprLength; i++) {
+            var c = expressionChars[i];
             if (allAvailableOperations.contains(c)) {
-                resultElements.add(sb.toString());
-                sb = new StringBuilder();
                 if (c == '-') {
-                    resultElements.add("+");
+                    if (i != 0 && !allAvailableOperations.contains(expressionChars[i - 1])) {
+                        resultElements.add(sb.toString());
+                        sb = new StringBuilder();
+                        resultElements.add("+");
+                    }
                     sb.append(c);
                 } else {
+                    resultElements.add(sb.toString());
+                    sb = new StringBuilder();
                     resultElements.add(Character.toString(c));
                 }
             } else {
@@ -130,7 +138,6 @@ public class DefaultCalculationService implements CalculationService {
     }
 
     private List<TypedExpressionRequest> getWithOperations(List<String> expressions, String operations) {
-        String prev = null;
         List<TypedExpressionRequest> resultExpressions = new ArrayList<>();
         for (int i = 0; i < expressions.size(); i++) {
             String left;
