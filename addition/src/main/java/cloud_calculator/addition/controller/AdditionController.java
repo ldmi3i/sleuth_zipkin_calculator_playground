@@ -40,6 +40,7 @@ public class AdditionController implements OperationController {
                 .doOnNext(expressionResponse -> {
                     tracer.currentSpan().annotate("Return response " + expressionResponse);
                     log.info("Return response {}", expressionResponse);
-                });
+                })
+                .doOnError(e -> tracer.currentSpan().annotate("Finished with error"));
     }
 }

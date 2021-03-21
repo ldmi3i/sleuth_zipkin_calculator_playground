@@ -37,10 +37,10 @@ public class ExponentiationController implements OperationController {
                     log.info("Retrieve expression {}", expressionRequest);
                 })
                 .transform(exponentiationService::processExpression)
-//                .map(expression -> ExpressionResponse.builder()
-//                        .result(expression.getLeft() - expression.getRight())
-//                        .id(expression.getId())
-//                        .build())
-                .doOnNext(expressionResponse -> log.info("Produce response {}", expressionResponse));
+                .doOnNext(expressionResponse -> {
+                    tracer.currentSpan().annotate("Return response " + expressionResponse);
+                    log.info("Return response {}", expressionResponse);
+                })
+                .doOnError(e -> tracer.currentSpan().annotate("Finished with error"));
     }
 }

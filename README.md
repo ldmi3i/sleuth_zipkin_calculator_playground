@@ -28,10 +28,13 @@ body
 ```
 
 ### Build and start
-Required: docker, gradle and +- 3 gb of free memory.
+Required: docker, gradle and 3+ gb of free memory.
 Build and start application with gradle and docker-compose:  
 ```gradle clean build```  
 ```docker-compose up -d --build```
+
+Stop and clean with:
+```docker-compose down --volumes --rmi local```
 
 ### Notes
 docker-compose file use the latest standard without version statement
