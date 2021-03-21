@@ -1,0 +1,7 @@
+server:
+  port: 8023
+spring:
+  application:
+    name: division-service
+  zipkin:
+    base-url: http://zipkin:9411/

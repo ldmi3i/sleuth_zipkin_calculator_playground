@@ -1,0 +1,7 @@
+server:
+  port: 8022
+spring:
+  application:
+    name: multiplication-service
+  zipkin:
+    base-url: http://zipkin:9411/
