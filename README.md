@@ -34,5 +34,8 @@ Build and start application with gradle and docker-compose:
 ```docker-compose up -d --build```
 
 ### Notes
+docker-compose file use the latest standard without version statement
+if you do not have the latest version of docker - add line to file like ```version '3.1'```
+
 Exponentiation operator can take only integer numbers because it converts it to expression and 
 reuses base calculation endpoint. (if number is double - it will be cast to int)
